@@ -1,0 +1,19 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiretlsservice
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequireTLSService
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiretlsservice
+
+        violation[{"msg": msg}] {
+          input.review.object.spec.type == "LoadBalancer"
+          not input.review.object.metadata.annotations["service.beta.kubernetes.io/aws-load-balancer-ssl-cert"]
+          msg := "LoadBalancer service must include a TLS annotation"
+        }

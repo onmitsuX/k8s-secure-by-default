@@ -1,0 +1,39 @@
+name: Gatekeeper Policy CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    name: Validate YAML and Rego
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python (for yamllint)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install yamllint
+          curl -L https://github.com/instrumenta/conftest/releases/download/v0.45.0/conftest_0.45.0_Linux_x86_64.tar.gz | tar xz
+          sudo mv conftest /usr/local/bin/
+
+      - name: Lint YAML files
+        run: |
+          yamllint . -c .yamllint.yml || true
+
+      - name: Run conftest against all test manifests
+        run: |
+          find . -name "*.yaml" -not -path "./.github/*" | xargs -I {} conftest test {}
+
+      - name: Markdown Lint (optional)
+        uses: avto-dev/markdown-lint@v1
+        with:
+          config: '.markdownlint.yml'
