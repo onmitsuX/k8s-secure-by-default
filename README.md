@@ -97,6 +97,9 @@ GitHub Actions is used to run policy compliance checks on all test manifests via
 
 CI Badge:
 
+![Gatekeeper CI](https://github.com/onmitsuX/k8s-secure-by-default/actions/workflows/gatekeeper-ci.yaml/badge.svg)
+
+
 * * * * *
 
 📬 Contributions
